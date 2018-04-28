@@ -1,0 +1,168 @@
+---
+title: "Project 2"
+author: "Honorio Vega, Andru Sancheez "
+date: "April 24, 2018"
+output: html_document
+---
+
+### Intro: 
+* We look at causes of crashes, how often accidents happen, examined drunk driving, miraculous survivors, locations of accidents, weather conditions, and traffic controls.
+
+### Data: 
+* We downloaded the Crash Reporting - Drivers Data in csv format from https://data.montgomerycountymd.gov/Public-Safety/Crash-Reporting-Drivers-Data/mmzv-x632 on March 13, 2018. 
+
+### Initial data exploration:
+* Upon initial exploration of the data, there are 32 columns and 65841 rows. All columns contain data of type 'Factor', except for longitude and latitude which are 'num'. Then we added another column, dat$dtime, with type POSIXlt to hold timestamps of the reported crash.
+
+### Data cleaning and preprocessing:
+* After looking over the data, we decided there wasn't any corrupted or NA data. There was a good amount of missing data for a few columns but we decided they were not significant enough to affect our work. We did do some preprocessing however, by adding a new dat$dtime column to hold POSIXlt type timestamps.
+
+### Data exploration and visualization:
+* See Questions 1-10 below.
+
+### Conclusions:
+* We learned how to use POSIXlt and work with timestamps.
+* Data can easily be omitted to skew a narrative. For example, the most common statistic for distracted driving might be N/A or Not Distracted, but data scientists can choose to focus only on the specified reasons for distracted driving. 
+
+----------------------------------------------------------------------------------------
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
+```
+
+```{r }
+dat = read.csv("Crash_Reporting_-_Drivers_Data.csv")
+dat$dtime = strptime(as.character(dat$Crash.Date.Time), "%m/%d/%Y %I:%M:%S %p", tz="America/New_York")
+```
+
+#####Question #1: How many incidents happened where n people were involved?
+#####Conclusion: Crashes are about twice as likely to happen when 2 people are in a car compared to just 1 person in the car.
+    
+The table shows how many people were the car when a crash occurs. There are 21,964 crash reports with 2 people in the car, and 11,367 crash reports from single drivers. 3 people in the car becomes less likely, but still possible with 2,744. Crashes with 4 to 8 people in the car are the least likely to happen. 
+
+```{r, fig.width = 10}
+table(as.vector(table(dat$Report.Number))) 
+```
+
+#####Question #2: What are the most common causes of crashes?
+#####Conclusion: Reports most commonly say driver was not distracted, or that the reason for distraction is unknown. When looking at specified reasons, "Looked but did not see" is the most common reason. 
+
+```{r, fig.width = 10}
+par(mar=c(4,25,4,4))
+barplot(sort(table(dat$Driver.Distracted.By), decreasing = TRUE), 
+            horiz=TRUE, las=TRUE, col = "blue", main="Causes of Crashes")
+```
+
+However, when we honed in only on the concrete reasons, the top 5 causes of crashes when drivers looked but did not see, were lost in thought, or distracted by something inside or outside of the car. Interestingly, we did not find that cell phones were a common reason for crashes.
+
+```{r, fig.width = 10}
+par(mar=c(4,25,4,4))
+barplot(sort(table(dat$Driver.Distracted.By), decreasing = TRUE)[3:7], 
+        horiz=TRUE, las=TRUE, col = "blue", main="Top 5 Causes of Crashes")
+```
+
+#####Question #3: Are crashes more likely to happen during holidays?
+#####Conclusion: There is a correlation of increase of crash reports during the month of May, and the Fall to Winter months. We hypothesize when students return to school, social activities increase and more people are on the road. For example for Halloween. 
+
+This graph shows the amount of accidents that have occurred by month. Data from 2018 accidents is not included because the year has not finished yet so earlier months would have their number of accidents inflated compared to later months. Interestingly enough, there were more accidents towards the ends of each year and also in May. Our hypothesis for the reasoning behind this is because of the start/end of school and holidays which involve traveling to vacation spots or to visit family such as Christmas and Thankgiving cause more accidents. 
+
+```{r, fig.width = 10}
+par(mar=c(6,4,4,2))
+barplot(table(dat$dtime$mon[dat$dtime$year != 118]), names.arg=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), col="blue", main="Accidents by Month", xlab="Month", ylab="Number of Accidents", ylim=c(0, 6000))
+abline(h=mean(table(dat$dtime$mon[dat$dtime$year != 118])), col="red")
+```
+
+#####Question #4: Are crashes more common during rush hours, when people generally are going to or leaving school/work?
+#####Conclusion: Yes.
+
+Below shows how common crashes are throughout the day. The solid red line indicates the average number of crashes within all 24 hours. The dotted green line is the mean of the hours that are above the red line, which are 7am to 7pm. Crashes are likely to happen at 8am, but even more abundantly from 3pm to 6pm. 
+
+```{r, fig.width = 10}
+par(mar=c(6,4,4,2))
+barplot(table(dat$dtime$hour), names.arg=c("12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"), col="blue", main="Accidents by Hour", xlab="Time (AM/PM)", ylab="Number of Accidents", ylim=c(0, 6000))
+abline(h=mean(table(dat$dtime$hour)), col="red")
+abline(h=mean(table(dat$dtime$hour)[8:20]), col="green", lwd=2,lty="dotted")
+```
+
+#####Question #5: Annually, are people becoming better drivers?
+#####Conclusion: Not really.
+
+Overall, number of crashes did not change too much. Accidents increased from 2015 to 2016. It decreased in 2017, but was still not as low as 2015. With only 3 complete years to look at, it is not possible to see much of a pattern. 2018 data was omitted insofar as the year has not finished yet. 
+
+```{r, fig.width = 10}
+par(mar=c(6,4,4,2))
+barplot(table(dat$dtime$year[dat$dtime$year != 118]), names.arg=c("2015", "2016", "2017"), col="blue", main="Annual Crashes", xlab="Year", ylab="Number of Accidents")
+abline(h=mean(table(dat$dtime$year[dat$dtime$year != 118])), col="red")
+```
+
+#####Question #6: When does drunk driving happen within 24 hours?
+#####Conclusion: In the evenings, from 7pm to 4am, peaking at midnight.
+
+Looking at only the rows of data where alcohol is mentioned, we found over a period of 24 hours that drunk driving was most common outside of rush hours and work hours. 
+
+```{r, fig.width = 10}
+datDrunk = dat[(dat$Driver.Substance.Abuse == "ALCOHOL CONTRIBUTED") | (dat$Driver.Substance.Abuse == "ALCOHOL PRESENT"),]
+par(mar=c(6,4,4,2))
+barplot(table(datDrunk$dtime$hour), names.arg=c("12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"), col="blue", main="Drunken Crashes by Hour", xlab="Time (AM/PM)", ylab="Number of Accidents", ylim=c(0, 250))
+abline(h=mean(table(datDrunk$dtime$hour)), col="red")
+```
+
+Applying a sort on the barplot, we found that drunk driving peaked in the specific hours of 10pm to 4am
+
+```{r, fig.width = 10}
+barplot(sort(table(datDrunk$dtime$hour)), col="blue", main="Drunken Crashes by Hour", xlab="Time (AM/PM)", ylab="Number of Accidents", ylim=c(0, 250))
+```
+
+#####Question #7: Is the damage to cars less when the driver is not hurt?
+#####Conclusion: Surprisingly, there are lots of disabling damage to cars.
+
+We wanted to see if the damage suffered by the vehicle would be less because the driver was not injured by the crash, infering that the crash was not too intense. However, there are a lot of cases in which the vehicle was disabled instead of suffering from no damage or superficial damage.
+
+```{r, fig.width = 10}
+par(mar=c(6,8,4,4))
+barplot(sort(table(dat$Vehicle.Damage.Extent[dat$Injury.Severity == "NO APPARENT INJURY"]), decreasing= TRUE), horiz=TRUE, las=TRUE, col="blue", xlim=c(0,20000), main="Damage to Car with No Apparent Injury to Driver")
+```
+
+#####Question #8: Where are the locations of accidents involving 6, 7, and 8 vehicles when compared to all the accidents that have occurred? Do all the accidents occur in areas where there are normally accidents?
+#####Conclusion: All these large accidents happen in areas with lots of accient except for one outlier.
+
+Using the information we have about the number of accidents based on the nunmber of people invovled, we wanted to see where the accidents involving 6, 7, and 8 people occurered. 7 of these accidents happened in common accident areas but surprisingly, 1 accident occurred in an area that did not have too many accidents. 
+
+```{r, fig.width = 10}
+plot(dat$Latitude, dat$Longitude, xlim=c(38.9, 39.4), ylim=c(-77.6, -76.8), pch=20, ylab="Longitude", xlab="Latitude")
+points(dat$Latitude[dat$Report.Number %in% names(tail(sort(table(dat$Report.Number)),18))], dat$Longitude[dat$Report.Number %in% names(tail(sort(table(dat$Report.Number)),18))], xlim=c(38.9, 39.4), ylim=c(-77.6, -76.8), main="Locations of 6, 7, and 8-man Accidents", col="red", pch=20)
+```
+
+#####Question #9: How do weather conditions affect crashes?
+#####Conclusion: Surprisingly, many crashes are not affected by weather. It is usually clear. Rainy or cloudy conditions are the most common reasons, if weather is specified to be other than Clear.
+
+```{r, fig.width = 10}
+par(mar=c(4,15,4,4))
+barplot(sort(table(dat$Weather), decreasing = TRUE), 
+            horiz=TRUE, las=TRUE, col = "blue", main="Number of Crashes by Weather")
+```
+
+#####Question #10: Where should the city spend money for traffic control?
+#####Conclusion: No traffic control is abundantly reported! More traffic controls should be installed, but where? The top 10 roads and top 10 cross-streets where crashes happen (with no traffic control) are listed below. Pay attention to 11th AVE and 13th Street; they show up in both barplots!
+
+First, we want to see how common crashes are where there is no traffic controls. The barplot below shows all traffic control data; no traffic controls is the most common traffic control attribute. This data could be helpful to the city to identify where more traffic control should be installed.
+
+```{r, fig.width = 10}
+par(mar=c(4,15,4,4))
+barplot(sort(table(dat$Traffic.Control), decreasing = TRUE), 
+            horiz=TRUE, las=TRUE, col = "blue", main="Number of Crashes by Traffic Control")
+```
+
+So, we will look at all the rows where the crash had no traffic controls and barplot their locations. 
+
+```{r, fig.width = 10}
+datNoControl = dat[(dat$Traffic.Control == "NO CONTROLS"),]
+par(mar=c(4,15,4,4))
+
+barplot(sort(table(datNoControl$Road.Name)[2:10], decreasing = TRUE), 
+            horiz=TRUE, las=TRUE, col = "blue", main="Top 10 Roads without Traffic Control")
+
+barplot(sort(table(datNoControl$Cross.Street.Name)[2:10], decreasing = TRUE), 
+            horiz=TRUE, las=TRUE, col = "blue", main="Top 10 Cross Streets without Traffic Control")
+```
