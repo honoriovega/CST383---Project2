@@ -1,6 +1,6 @@
 ---
 title: "Project 2"
-author: "Honorio Vega, Andru Sancheez "
+author: "Honorio Vega, Andrew Sanchez, Bret Stine "
 date: "April 24, 2018"
 output: html_document
 ---
