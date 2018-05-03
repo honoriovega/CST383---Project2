@@ -36,7 +36,7 @@ knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
 ```
 
 ```{r }
-dat = read.csv("Crash_Reporting_-_Drivers_Data.csv")
+dat = read.csv("/Users/Home/Crash_Reporting_-_Drivers_Data.csv")
 dat$dtime = strptime(as.character(dat$Crash.Date.Time), "%m/%d/%Y %I:%M:%S %p", tz="America/New_York")
 ```
 
