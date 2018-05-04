@@ -1,7 +1,7 @@
 ---
-title: "Project 2"
-author: "Honorio Vega, Andrew Sanchez, Bret Stine "
-date: "April 24, 2018"
+title: "Project 2 - Video Game Sales Prediction"
+author: "Honorio Vega, Andrew Sanchez, Bret Stine"
+date: "May 3, 2018"
 output: html_document
 ---
 ```{r global_options, include=FALSE}
@@ -9,15 +9,22 @@ knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
 ```
 
 ```{r }
+<<<<<<< HEAD:output.Rmd
 dat = read.csv("data/Video_Game_Sales_as_of_Jan_2017.csv")
 ```
 
 
+=======
+setwd('..')
+dat = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+```
+
+>>>>>>> c0860ba39ba05d8c6b017ca3a8a13cc20be749c6:templates/output.Rmd
 ### Intro: 
-* We look at causes of crashes, how often accidents happen, examined drunk driving, miraculous survivors, locations of accidents, weather conditions, and traffic controls.
+* We look at video games popularity, based on the ratings and reviews we will try to predict the sales of a game.
 
 ### Data: 
-* We downloaded the Crash Reporting - Drivers Data in csv format from https://data.montgomerycountymd.gov/Public-Safety/Crash-Reporting-Drivers-Data/mmzv-x632 on March 13, 2018. 
+* We downloaded the Video Game data in csv format from https://www.kaggle.com/kendallgillies/video-game-sales-and-ratings/data on May 3, 2018. 
 
 ### Initial data exploration:
 * Upon initial exploration of the data, there are 32 columns and 65841 rows. All columns contain data of type 'Factor', except for longitude and latitude which are 'num'. Then we added another column, dat$dtime, with type POSIXlt to hold timestamps of the reported crash.
