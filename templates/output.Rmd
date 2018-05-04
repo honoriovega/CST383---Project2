@@ -9,17 +9,12 @@ knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
 ```
 
 ```{r }
-<<<<<<< HEAD:output.Rmd
-dat = read.csv("data/Video_Game_Sales_as_of_Jan_2017.csv")
-```
-
-
-=======
 setwd('..')
-dat = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+at = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 ```
 
->>>>>>> c0860ba39ba05d8c6b017ca3a8a13cc20be749c6:templates/output.Rmd
+
+```
 ### Intro: 
 * We look at video games popularity, based on the ratings and reviews we will try to predict the sales of a game.
 
