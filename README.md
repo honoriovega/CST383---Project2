@@ -1,6 +1,6 @@
 # CST383---Project2
 [Notes](https://docs.google.com/document/d/1vFNwFE4N003kIkTM-nWVUDCLOxeDa419aMzrYmvlzBY/edit)
-
+[Report](https://cst383-project2.herokuapp.com/)
 # Final Project
 Your goal is to complete a small but professional data science project.  
 ## Project guidelines
