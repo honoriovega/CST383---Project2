@@ -31,9 +31,26 @@ barplot(table(dat$genre),horiz=TRUE,las=1)
 
 ```{r}
 plot(critic_score ~ genre, data=dat)
+
 plot(user_score ~ genre, data=dat)
+
 barplot(table(dat$hit, dat$genre), col=c("RED","NAVY"))
+
 plot(global_sales[hit==1] ~ critic_score[hit==1], data=dat, col="RED", pch=20, xlab="Critic Score", ylab="Global Sales", main="Critic Score by Global Sales")
 points(global_sales[hit==0] ~ critic_score[hit==0], data=dat, col="NAVY", pch=20)
+
+barplot(table(dat$global_sales, dat$rating))
+
+#library(gridExtra)
+#tab = table(dat$genre, dat$global_sales)
+#grid.table(tab)
+
 ```
+
+Some more ideas to explore. 
+  - Number of games per platform to find out which platform has the most games.
+  - Does a certain genre sell more than others
+  - Developers/publishers that produce the most games
+  - Is there a certain Devloper/publisher that sell the most
+
 
