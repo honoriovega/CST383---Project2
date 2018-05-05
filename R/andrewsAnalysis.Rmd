@@ -6,21 +6,34 @@ dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 
 ```{r}
 # 7191 complet cases
+set.seed(123)
 before = nrow(dat)
 
 # get all the complete cases
 # we retain 41% of our data and discard 59%
-#dat = dat[complete.cases(dat),]
+dat = dat[complete.cases(dat),]
 after = nrow(dat)
 print(after/before)
+
+# Converting column names from uppers to lowers
+names(dat) = tolower(names(dat))
+str(dat)
+summary(dat)
+
+# Adding column 'hit' based off of global sales threshold of 1 mil copies sold
+dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
 ```
 
 
 ```{r}
-barplot(table(dat$Genre),horiz=TRUE,las=1)
+barplot(table(dat$genre),horiz=TRUE,las=1)
 ```
 
 ```{r}
-
+plot(critic_score ~ genre, data=dat)
+plot(user_score ~ genre, data=dat)
+barplot(table(dat$hit, dat$genre), col=c("RED","NAVY"))
+plot(global_sales[hit==1] ~ critic_score[hit==1], data=dat, col="RED", pch=20, xlab="Critic Score", ylab="Global Sales", main="Critic Score by Global Sales")
+points(global_sales[hit==0] ~ critic_score[hit==0], data=dat, col="NAVY", pch=20)
 ```
 
