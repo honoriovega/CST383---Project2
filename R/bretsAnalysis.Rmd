@@ -1,0 +1,62 @@
+---
+title: "bretsAnalysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rpart)
+library(rpart.plot)
+library(maptree)
+source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
+
+setwd('..')
+dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+```
+
+```{r}
+# 7191 complet cases
+set.seed(123)
+dat = dat[complete.cases(dat),]
+
+# Converting column names from uppers to lowers
+names(dat) = tolower(names(dat))
+```
+
+```{r}
+str(dat)
+```
+
+```{r}
+split = split_data(dat, c(4,1))
+tr_dat = split[[1]]
+te_dat = split[[2]]
+```
+
+
+```{r}
+fit = rpart(global_sales ~ genre + platform + user_count, data=tr_dat)
+```
+
+```{r}
+prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales",box.col="tan")
+```
+
+
+```{r}
+predicted = predict(fit, te_dat)
+errors = te_dat$global_sales - predicted
+rmse = sqrt(mean(errors^2))
+rmse
+```
+
+
+
+```{r}
+plot_predict_actual(predicted, te_dat$global_sales, 1.5, "regression tree price prediction")
+```
+
+
