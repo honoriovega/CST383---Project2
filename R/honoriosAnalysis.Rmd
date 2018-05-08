@@ -29,6 +29,8 @@ dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
 
 
 ```{r}
+#bottom, left, top, and rig
+par(mar=c(5,6,1,1))
 barplot(table(dat$genre),horiz=TRUE,las=1)
 ```
 
@@ -63,9 +65,10 @@ barplot(sort(table(dat$platform),ascending=T),horiz=T, las=1, col="RED", main="G
 # 
 set.seed(123)
 
+# 70% and 30% split
 tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
-tr_dat = dat[tr_rows,]
-te_dat = dat[-tr_rows,]
+tr_dat = dat[tr_rows,] # training data
+te_dat = dat[-tr_rows,] # test data
 ```
 
 
@@ -73,16 +76,34 @@ te_dat = dat[-tr_rows,]
 ```{r}
 #dat$hit = as.numeric(dat$hit)
 
+# predicting hit, using predictor global_sales, platform and critic_score
 fit = glm(hit ~ global_sales + platform + critic_score, family=binomial(), data=tr_dat)
+
 # Summary
 summary(fit)
 
-# Conf Mtx
+# Confusion Matrix
 temp = predict(fit, newdata=te_dat, type="response")
 predicts = as.numeric(temp > 0.7)
 actuals = te_dat$hit
 conf_mtx = table(predicts, actuals)
 conf_mtx
+
+
+
+fit = glm(hit ~ global_sales + platform + critic_score, family=binomial(), data=tr_dat)
+
+# Summary
+summary(fit)
+
+# Confusion Matrix
+temp = predict(fit, newdata=te_dat, type="response")
+predicts = as.numeric(temp > 0.7)
+actuals = te_dat$hit
+conf_mtx = table(predicts, actuals)
+conf_mtx
+
+
 ```
 
 ```{r}
@@ -90,6 +111,20 @@ conf_mtx
 succ_rate = mean(predicts == actuals)
 succ_rate
 ```
+
+```{r}
+
+# Is there a certain Devloper/publisher that sell the most
+
+
+publishedGamesByPublish = table(dat$publisher )
+publishedGamesByPublish = publishedGamesByPublish[publishedGamesByPublish > 0]
+publishedGamesByPublish = sort(publishedGamesByPublish,decreasing=TRUE)
+#bottom, left, top, and rig
+par(mar=c(5,15,1,1))
+barplot(head(publishedGamesByPublish,10),horiz=TRUE,las=1,main="Top 10 Publishers with the most games")
+```
+
 
 Some more ideas to explore. 
   - Number of games per platform to find out which platform has the most games.
