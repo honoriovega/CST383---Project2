@@ -3,7 +3,6 @@
 library(rpart)
 library(rpart.plot)
 library(maptree)
-library(caret)
 setwd('..')
 dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 ```
