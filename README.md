@@ -1,6 +1,8 @@
-# CST383---Project2
 [Notes](https://docs.google.com/document/d/1vFNwFE4N003kIkTM-nWVUDCLOxeDa419aMzrYmvlzBY/edit)
-
+[Report](https://cst383-project2.herokuapp.com/)
+#### CST 383: Intro to Data Science  - Dr. Glenn Bruns
+#### Spring 2018
+###### Report Submitter: Andrew Sanchez
 # Final Project
 Your goal is to complete a small but professional data science project.  
 ## Project guidelines
