@@ -5,10 +5,11 @@ library(rpart.plot)
 library(maptree)
 setwd('..')
 dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
 ```
 
 ```{r}
-# 7191 complet cases
+# 7191 complete cases
 set.seed(123)
 before = nrow(dat)
 
@@ -24,7 +25,7 @@ str(dat)
 summary(dat)
 
 # Adding column 'hit' based off of global sales threshold of 1 mil copies sold
-dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
+#dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
 ```
 
 
@@ -69,27 +70,39 @@ te_dat = dat[-tr_rows,]
 ```
 
 
-### Logistic Regression
+### Linear Regression
 ```{r}
-#dat$hit = as.numeric(dat$hit)
 
-fit = glm(hit ~ global_sales + platform + critic_score, family=binomial(), data=tr_dat)
+fit = lm(global_sales ~ user_count + user_score, data=tr_dat)
 # Summary
 summary(fit)
 
 # Conf Mtx
-temp = predict(fit, newdata=te_dat, type="response")
-predicts = as.numeric(temp > 0.7)
-actuals = te_dat$hit
-conf_mtx = table(predicts, actuals)
-conf_mtx
+#temp = predict(fit, newdata=te_dat, type="response")
+#predicts = as.numeric(temp > 0.7)
+#actuals = te_dat$hit
+#conf_mtx = table(predicts, actuals)
+#conf_mtx
 ```
 
 ```{r}
-# Success Rate
-succ_rate = mean(predicts == actuals)
-succ_rate
+# Plot
+plot(tr_dat$global_sales ~ predict(fit), data=tr_dat, col="DARK RED", pch=20, main="Actual Global Sales by Predicted Global Sales", xlab="Predicted", ylab="Sales")
+abline(a=0, b=1, col="BLUE", lty=2, lwd=2)
 ```
+
+
+### RMSE
+```{r}
+predicted = predict(fit, te_dat)
+errors = te_dat$global_sales-predicted
+plot(density(errors))
+
+# RMSE
+rmse = sqrt(mean(errors^2))
+rmse
+```
+
 
 Some more ideas to explore. 
   - Number of games per platform to find out which platform has the most games.
