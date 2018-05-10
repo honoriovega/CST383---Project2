@@ -70,10 +70,20 @@ te_dat = dat[-tr_rows,]
 ```
 
 
+### Cross Validation
+```{r}
+rmse_cv = cross_validate_lm(tr_dat, "global_sales", c("user_count","user_score"))
+rmse_cv
+print(paste0("RMSE from cross validation: ", round(rmse_cv)))
+```
+
+
+
 ### Linear Regression
+Linear regression model built from the features of user count and user score. From our summary we see that user count and user score of ***, this in turn means they have strong relationship to global sales.
 ```{r}
 
-fit = lm(global_sales ~ user_count + user_score, data=tr_dat)
+fit = lm(global_sales ~ user_count * user_score, data=tr_dat)
 # Summary
 summary(fit)
 
@@ -87,7 +97,10 @@ summary(fit)
 
 ```{r}
 # Plot
-plot(tr_dat$global_sales ~ predict(fit), data=tr_dat, col="DARK RED", pch=20, main="Actual Global Sales by Predicted Global Sales", xlab="Predicted", ylab="Sales")
+predicted = predict(fit, newdata=te_dat)
+actual = te_dat$global_sales
+
+plot(actual ~ predicted, col="DARK RED", pch=20, main="Actual Global Sales by Predicted Global Sales", xlab="Predicted", ylab="Sales")
 abline(a=0, b=1, col="BLUE", lty=2, lwd=2)
 ```
 
@@ -95,12 +108,29 @@ abline(a=0, b=1, col="BLUE", lty=2, lwd=2)
 ### RMSE
 ```{r}
 predicted = predict(fit, te_dat)
-errors = te_dat$global_sales-predicted
-plot(density(errors))
+errors = actual-predicted
+#plot(density(errors))
+hist(errors)
 
 # RMSE
-rmse = sqrt(mean(errors^2))
+#rmse = sqrt(mean(errors^2))
+rmse = sqrt(mean((actual-predicted)^2))
 rmse
+```
+
+
+### Linear Regression Diagnostics
+```{r}
+plot(fit)
+```
+
+
+### KNN Regression
+```{r}
+x = tr_dat$user_score
+y = tr_dat$user_count
+plot(tr_dat$user_score, tr_dat$user_count)
+dist(x,y, method="euclidean")
 ```
 
 
