@@ -12,6 +12,31 @@ library(rpart)
 library(rpart.plot)
 library(maptree)
 source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
+cross_validate_lm = function(dat, y, xs, n=10) {
+  # create the formula to be used with lm
+  ff = reformulate(xs, y)
+  
+  # compute indexes of the groups
+  k = nrow(dat)  
+  dat1 = dat[sample(1:k),]     # shuffle the data
+  starts = seq(1, k, by=floor(k/n))[1:n]
+  ends = c(starts[2:n]-1, k)
+  
+  sum_rmse = 0
+  for (i in 1:n) {
+    tests = starts[i]:ends[i]
+    fit = lm(ff, data=dat1[-tests,])
+    if (length(fit$coefficients) > fit$rank) {
+      print(paste0("rank-deficit problem with ", ff))
+    }
+    predicted = predict(fit, newdata=dat1[tests,])
+    actual = dat1[tests,y]
+    rmse = sqrt(mean((actual-predicted)^2))
+    sum_rmse = sum_rmse + rmse
+    # print(paste0(i,": RMSE = ",rmse))
+  }
+  return(sum_rmse/n)
+}
 
 setwd('..')
 dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
@@ -42,7 +67,7 @@ fit = rpart(global_sales ~ genre + platform + user_count, data=tr_dat)
 ```
 
 ```{r}
-prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales",box.col="tan")
+prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales", type = 2, tweak = 1.5, box.col="tan")
 ```
 
 
@@ -56,7 +81,16 @@ rmse
 
 
 ```{r}
-plot_predict_actual(predicted, te_dat$global_sales, 1.5, "regression tree price prediction")
+plot_predict_actual(predicted, te_dat$global_sales, 2, "regression tree price prediction")
 ```
 
 
+```{r}
+names = c("global_sales","critic_count", "critic_score", "user_count", "user_score")
+plot(dat[,names])
+```
+
+```{r}
+rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv
+```
