@@ -12,14 +12,30 @@ dat = read.csv( paste0(getwd(), "/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 set.seed(123)
 before = nrow(dat)
 
-# get all the complete cases
-# we retain 41% of our data and discard 59%
-dat = dat[complete.cases(dat),]
-after = nrow(dat)
-print(after/before)
-
 # Converting column names from uppers to lowers
 names(dat) = tolower(names(dat))
+
+# get all the complete cases
+# we retain 41% of our data and discard 59%
+
+dat = dat[complete.cases(dat),]
+barplot(table(dat$year_of_release),horiz=TRUE,las=1)
+
+# get rid of video games where the data was prior to 2000 based on the barplot
+# they don't contribute much
+dat = dat[as.numeric(as.character(dat$year_of_release)) >= 2000,]
+barplot(table(dat$year_of_release),horiz=TRUE,las=1)
+
+
+# based on this throw away games before 2000 because they don't contribute much
+sum(dat$year_of_release >= 2000)
+barplot(table(dat$year_of_release),horiz=TRUE,las=1)
+
+after = nrow(dat)
+
+print(after/before)
+
+
 dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
 
 # we are predicitng global sales
@@ -37,4 +53,8 @@ conf_mtx
 
 succ_rate = mean(predicts == actuals)
 succ_rate
+
+
+#0.8220575 - success rate using linear regression to predict global sales using critic_score
+
 ```
