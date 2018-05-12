@@ -8,29 +8,37 @@ output: html_document
 knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
 ```
 
+### Goal
+Our team's goal is to predict global video game sales based off of collected data in the past 15 years. 
+
+### Intro(Need More)
+The dataset comes from Kaggle.com and is a compilation of video games sales along with ratings. 
+
+### Read & Preprocessing
+We read the data in and begin preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score.
 ```{r }
 setwd('..')
-at = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+dat = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
+names(dat) = tolower(names(dat))
+```
+The data set contains 17416 rows of data with a majority of games being released between 2000s and above.
+
+```{r}
+set.seed(123)
+before = nrow(dat)
+before
+
+par(mar=c(3,7,1,1))
+barplot(table(dat$year_of_release), horiz=T, col="RED", las=1)
+```
+
+After using complete cases we retain 41% of our data that is recent and relevant to our prediction of global sales. 
+```{r}
+dat = dat[complete.cases(dat),]
+after = nrow(dat)
+after/before
 ```
 
 
-```
-### Intro: 
-* We look at video games popularity, based on the ratings and reviews we will try to predict the sales of a game.
 
-### Data: 
-* We downloaded the Video Game data in csv format from https://www.kaggle.com/kendallgillies/video-game-sales-and-ratings/data on May 3, 2018. 
-
-### Initial data exploration:
-* Upon initial exploration of the data, there are 32 columns and 65841 rows. All columns contain data of type 'Factor', except for longitude and latitude which are 'num'. Then we added another column, dat$dtime, with type POSIXlt to hold timestamps of the reported crash.
-
-### Data cleaning and preprocessing:
-* After looking over the data, we decided there wasn't any corrupted or NA data. There was a good amount of missing data for a few columns but we decided they were not significant enough to affect our work. We did do some preprocessing however, by adding a new dat$dtime column to hold POSIXlt type timestamps.
-
-### Data exploration and visualization:
-* See Questions 1-10 below.
-
-### Conclusions:
-* We learned how to use POSIXlt and work with timestamps.
-* Data can easily be omitted to skew a narrative. For example, the most common statistic for distracted driving might be N/A or Not Distracted, but data scientists can choose to focus only on the specified reasons for distracted driving. 
 
