@@ -6,6 +6,10 @@ output: html_document
 ---
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
+library(rpart)
+library(rpart.plot)
+library(maptree)
+source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
 ```
 
 ### Goal
@@ -16,11 +20,13 @@ The dataset comes from Kaggle.com and is a compilation of video games sales alon
 
 ### Read & Preprocessing
 We read the data in and begin preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score.
+
 ```{r }
 setwd('..')
 dat = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 names(dat) = tolower(names(dat))
 ```
+
 The data set contains 17416 rows of data with a majority of games being released between 2000s and above.
 
 ```{r}
@@ -33,12 +39,81 @@ barplot(table(dat$year_of_release), horiz=T, col="RED", las=1)
 ```
 
 After using complete cases we retain 41% of our data that is recent and relevant to our prediction of global sales. 
+
 ```{r}
 dat = dat[complete.cases(dat),]
 after = nrow(dat)
 after/before
+
+```
+
+### Average Sales by Genres
+
+```{r}
+topGenres = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ genre, data=dat, function(x) mean(x))
+topGenres = topGenres[order(-topGenres$global_sales),]
+head(topGenres, 10)
+```
+
+### Highest Sales by Platform
+We see in this data set that PS2 has highest sum of sales of all platforms. While X360 and PS3 come in second and third respectively. Its suprising to see PS2 have the highest sum of sales since it was relased in March of 2000. 
+```{r}
+topPlatforms = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ platform, data=dat, function(x) sum(x))
+topPlatforms = topPlatforms[order(-topPlatforms$global_sales),]
+head(topPlatforms, 10)
 ```
 
 
+### Critic Scores lead to Higher Global Sales?
+From our plot we see that games that achieved a critic score greater than 50 tended to have higher global sales. While majority of games that didn't achieve sales of 1 Million are distributed 20-100.
+```{r}
+plot(global_sales[global_sales>1] ~ critic_score[global_sales>1], data=dat, col="RED", pch=20, xlab="Critic Score", ylab="Sales", main="Critic Score by Global Sales")
+points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, col="NAVY", pch=20)
+```
+
+### Cumlative Distribution of Global Sales(?)
+```{r}
+plot(ecdf(dat$global_sales), col="RED", main="Global Sales")
+```
 
 
+### Sampling & Splitting
+We sample from the data and create training and test data sets with a 70/30 split respectively.
+```{r}
+# 
+set.seed(123)
+
+tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
+tr_dat = dat[tr_rows,]
+te_dat = dat[-tr_rows,]
+```
+
+### Linear Regression(Model 1)
+Linear regression model built from the features of user count and user score. From our summary we see that user count and user score of ***, this in turn means they have strong relationship to global sales.
+```{r}
+fit = lm(global_sales ~ user_count + user_score, data=tr_dat)
+summary(fit)
+```
+
+```{r}
+# Plot
+predicted = predict(fit, newdata=te_dat)
+actual = te_dat$global_sales
+plot_predict_actual(predicted, actual, 1, "Actual vs Predicted Global Sales")
+```
+
+We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.68.
+```{r}
+lmErrs = actual-predicted
+rmse = sqrt(mean((actual-predicted)^2))
+rmse
+```
+
+
+### (Model 2)
+
+### (Model 3)
+
+### Comparison of Models
+
+### Our Conclusion
