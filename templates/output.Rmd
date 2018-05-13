@@ -10,12 +10,42 @@ library(rpart)
 library(rpart.plot)
 library(maptree)
 source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
+# perform n-fold cross-validation on the given data set; return mean rmse
+# dat - a data frame
+# y - response variable, as a string
+# xs - predictor variables, as a vector of strings
+# n   - the 'n' in n-fold cross-validation
+cross_validate_lm = function(dat, y, xs, n=10) {
+  # create the formula to be used with lm
+  ff = reformulate(xs, y)
+  
+  # compute indexes of the groups
+  k = nrow(dat)  
+  dat1 = dat[sample(1:k),]     # shuffle the data
+  starts = seq(1, k, by=floor(k/n))[1:n]
+  ends = c(starts[2:n]-1, k)
+  
+  sum_rmse = 0
+  for (i in 1:n) {
+    tests = starts[i]:ends[i]
+    fit = lm(ff, data=dat1[-tests,])
+    if (length(fit$coefficients) > fit$rank) {
+      print(paste0("rank-deficit problem with ", ff))
+    }
+    predicted = predict(fit, newdata=dat1[tests,])
+    actual = dat1[tests,y]
+    rmse = sqrt(mean((actual-predicted)^2))
+    sum_rmse = sum_rmse + rmse
+    # print(paste0(i,": RMSE = ",rmse))
+  }
+  return(sum_rmse/n)
+}
 ```
 
 ### Goal
-Our team's goal is to predict global video game sales based off of collected data in the past 15 years. 
+Our team's goal is to predict global video game sales based off of data collected in the past 15 years. 
 
-### Intro(Need More)
+### Introduction(Need More)
 The dataset comes from Kaggle.com and is a compilation of video games sales along with ratings. 
 
 ### Read & Preprocessing
@@ -73,7 +103,7 @@ points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, co
 
 ### Cumlative Distribution of Global Sales(?)
 ```{r}
-plot(ecdf(dat$global_sales), col="RED", main="Global Sales")
+plot(ecdf(dat$critic_score), col="RED", main="Global Sales")
 ```
 
 
@@ -83,12 +113,15 @@ We sample from the data and create training and test data sets with a 70/30 spli
 # 
 set.seed(123)
 
-tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
-tr_dat = dat[tr_rows,]
-te_dat = dat[-tr_rows,]
+#tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
+#tr_dat = dat[tr_rows,]
+#te_dat = dat[-tr_rows,]
+split = split_data(dat, c(4,1))
+tr_dat = split[[1]]
+te_dat = split[[2]]
 ```
 
-### Linear Regression(Model 1)
+### Linear Regression (Model 1)
 Linear regression model built from the features of user count and user score. From our summary we see that user count and user score of ***, this in turn means they have strong relationship to global sales.
 ```{r}
 fit = lm(global_sales ~ user_count + user_score, data=tr_dat)
@@ -110,7 +143,40 @@ rmse
 ```
 
 
-### (Model 2)
+### Regression Tree (Model 2)
+```{r}
+fit = rpart(global_sales ~ genre + platform + user_count, data=tr_dat)
+```
+
+
+
+```{r}
+prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales", type = 2, tweak = 1.5, box.col="tan")
+```
+
+
+
+```{r}
+predicted = predict(fit, te_dat)
+errors = te_dat$global_sales - predicted
+rmse = sqrt(mean(errors^2))
+rmse
+```
+
+
+
+```{r}
+plot_predict_actual(predicted, te_dat$global_sales, 2, "regression tree price prediction")
+```
+
+
+
+```{r}
+rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv
+```
+
+
 
 ### (Model 3)
 
