@@ -59,6 +59,10 @@ names(dat) = tolower(names(dat))
 # NAs
 sum(is.na(dat))
 
+# Before
+before = nrow(dat)
+before
+
 # Remove any rows with missing data
 dat = dat[complete.cases(dat),]
 
@@ -72,14 +76,12 @@ The data set contains 17416 rows of data with a majority of games being released
 
 ```{r}
 set.seed(123)
-before = nrow(dat)
-before
 
 par(mar=c(3,7,1,1))
-barplot(table(dat$year_of_release), horiz=T, col="RED", las=1)
+barplot(table(dat$year_of_release)[20:43], horiz=T, col="RED", las=1, main="Games by Year of Release")
 ```
 
-After using complete cases we retain 41% of our data that is recent and relevant to our prediction of global sales. 
+After using complete cases we retain 40% of our data that is recent and relevant to our prediction of global sales. 
 
 ```{r}
 dat = dat[complete.cases(dat),]
@@ -112,13 +114,14 @@ plot(global_sales[global_sales>1] ~ critic_score[global_sales>1], data=dat, col=
 points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, col="NAVY", pch=20)
 ```
 
-### Cumlative Distribution of Critic Score 
+### Cumlative Distribution of Critic Score
 We see that from curve from the plot that the
 ```{r}
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
+lines(ecdf(dat$user_score), col="BLUE", main="User Score")
 ```
 
-### Critic Scores vs User Scores
+### Critic Scores vs User Scores by Genres
 We see overall user scores are generally higher than critics scores. User scores are usually based off their experiences and impressions of a game, while critic scores are generally follow baselines of how to score a game. 
 ```{r}
 par(mfrow=c(1,2))
@@ -150,7 +153,7 @@ te_dat = split[[2]]
 ### Linear Regression (Model 1)
 Linear regression model built from the features of critic score and user score. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
 ```{r}
-fit = lm(global_sales ~ critic_score + user_score, data=tr_dat)
+fit = lm(global_sales ~ genre + platform + user_count, data=tr_dat)
 summary(fit)
 ```
 
@@ -161,14 +164,7 @@ actual = te_dat$global_sales
 plot_predict_actual(predicted, actual, 1, "Actual vs Predicted Global Sales")
 ```
 
-```{r}
-# Plot
-plot(fit$residuals)
-plot(fit$model)
-
-```
-
-We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.71
+We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.68
 ```{r}
 lmErrs = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
@@ -177,35 +173,34 @@ rmse
 
 
 ### Regression Tree (Model 2)
+Having used Linear Regression and achieving an RMSE of 1.71, we decided to use a Regression Tree model to compare the two models and try to lower the RMSE of the Linear Regression. Unlike the previous model, Regression Tree uses the library rpart to create the model. Focusing on genre, platform, and user_count, we hope to achieve an RMSE of around 1.5 using a Regression Tree.
+
 ```{r}
 fit = rpart(global_sales ~ genre + platform + user_count, data=tr_dat)
 ```
-
-
+This is the plotted Regression Tree model using features genre, platform, and user_count. This Regression Tree split initially by user_score of 314. Based on how relevant each feature is, the tree split from there. Looking at the platform = PC, PSV, the split there is based off how popular a specific platform is and its relevance to global_sales. For the outcome of the Regression Tree, platform is the most relevant feature based on each ending platform leaf node.
 
 ```{r}
 prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales", type = 2, tweak = 1.5, box.col="tan")
 ```
-
-
+Here is the calculated RMSE using the testing data and the predicted fit. We achieved an RMSE of 1.495, which is lower than our predicted RMSE before we began the Regression Tree model. Comparing Regression Tree to Linear Regression,
 
 ```{r}
 predicted = predict(fit, te_dat)
-regErrs = te_dat$global_sales - predicted
-rmse = sqrt(mean(regErrs^2))
+errors = te_dat$global_sales - predicted
+rmse = sqrt(mean(errors^2))
 rmse
 ```
-
-
+Looking at the predicted line versus the actual points, the predicted line follows the points to a certain extent. However, the plot_predict_actual is designed to work with lnear regression. Here, we are using it for Regression Trees, but the point of the plot is to show if the predicted line at all matches the points. From the plotted points, the predicted line follows the points and implies that the model works with the data.
 
 ```{r}
 plot_predict_actual(predicted, te_dat$global_sales, 2, "regression tree price prediction")
 ```
 
-
+Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577
 
 ```{r}
-rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv = cross_validate_lm(dat, "global_sales", c("platform", "genre", "user_count"))
 rmse_cv
 ```
 
@@ -214,8 +209,8 @@ rmse_cv
 ### Comparison of Models
 ```{r}
 par(mfrow=c(1,3))
-hist(lmErrs, col="RED", main="Hist of Linear Regression")
-hist(regErrs, col="RED", main="Hist of Regression Tree Model")
+hist(lmErrs, col="RED", main="Hist of Linear Regression", xlab="Errors")
+hist(regErrs, col="RED", main="Hist of Regression Tree Model", xlab="Errors")
 ```
 
 ### Our Conclusion
