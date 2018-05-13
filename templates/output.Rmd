@@ -45,7 +45,7 @@ cross_validate_lm = function(dat, y, xs, n=10) {
 ### Goal
 Our team's goal is to predict global video game sales based off of data collected in the past 15 years. 
 
-### Introduction(Need More)
+### Introduction
 The dataset comes from Kaggle.com and is a compilation of video games sales along with ratings. 
 
 ### Read & Preprocessing
@@ -106,11 +106,17 @@ points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, co
 
 ### Cumlative Distribution of Critic Score(?)
 ```{r}
-<<<<<<< HEAD
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
-=======
-plot(ecdf(dat$critic_score), col="RED", main="Global Sales")
->>>>>>> 32814010be80dec8826ca90051b054b50c014548
+```
+
+### Critic Scores vs User Scores
+We see overall user scores are generally higher than critics scores. User scores are usually based off their experiences and impressions of a game, while critic scores are generally follow baselines of how to score a game. 
+```{r}
+par(mfrow=c(1,2))
+# Critic Score
+plot(critic_score ~ genre, data=dat, main="Critic Score by Genre", xlab="Genre", ylab="Critic Score", col="RED")
+# User Score
+plot(user_score ~ genre, data=dat, main="User Score by Genre", xlab="Genre", ylab="User Score", col="RED")
 ```
 
 
@@ -120,9 +126,6 @@ We sample from the data and create training and test data sets with a 70/30 spli
 # 
 set.seed(123)
 
-#tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
-#tr_dat = dat[tr_rows,]
-#te_dat = dat[-tr_rows,]
 split = split_data(dat, c(4,1))
 tr_dat = split[[1]]
 te_dat = split[[2]]
@@ -150,28 +153,6 @@ rmse
 plot(fit)
 ```
 
-### Learning Curves(Model 1)
-```{r}
-library(caret)
-learningCurve = function(training, test, interval, max) {
-  tr_errs = c()
-  te_errs = c()
-  tr_act = tr_dat$global_sales
-  te_act = te_dat$global_sales
-  sizes = seq(interval, max, interval)
-  for (size in sizes) {
-    dat = tr_dat[1:size,]
-    fit = lm(global_sales ~ user_score + user_count, data=dat)
-    tr_pred = predict(fit)
-    te_pred = predict(fit, newdata=te_dat)
-    tr_errs = c(tr_errs, 1-mean(tr_pred==tr_act))
-    te_errs = c(te_errs, 1-mean(te_pred==te_act))
-  }
-  plot(sizes, tr_errs, type="b", xlab="Training Size", ylab="Error", col="blue")
-  points(sizes, te_errs, type="b", col="RED")
-}
-learningCurve(tr_dat, te_dat, 100, 1000)
-```
 
 
 ### Regression Tree (Model 2)
@@ -206,7 +187,6 @@ plot_predict_actual(predicted, te_dat$global_sales, 2, "regression tree price pr
 rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user_count"))
 rmse_cv
 ```
-
 
 
 ### (Model 3)
