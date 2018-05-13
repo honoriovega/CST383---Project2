@@ -1,5 +1,5 @@
 ---
-title: "Project 2 - Video Game Sales Prediction"
+title: "Analysis of Video Game Sales Prediction"
 author: "Honorio Vega, Andrew Sanchez, Bret Stine"
 date: "May 3, 2018"
 output: html_document
@@ -42,14 +42,14 @@ cross_validate_lm = function(dat, y, xs, n=10) {
 }
 ```
 
-### Goal
+### Goal/Hypothesis
 Our team's goal is to predict global video game sales based off of data collected in the past 15 years. 
 
 ### Introduction
 The data set is based off of video game sales as of January 2017. Origin of the data can be found using the link provided:  https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings. We decided to use this data set because of each member has an attachment to video games. Being able to predict future video game sales would be valuable to consumers and companies. 
 
 ### Read & Preprocessing
-We read the data in and began preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score.
+We read the data in and begin preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score. We also scale user score from 0-100 that way it will resemble critics score scaling.
 
 ```{r }
 setwd('..')
@@ -64,6 +64,8 @@ dat = dat[complete.cases(dat),]
 
 # throw away rows with year less than 2000
 dat = dat[as.numeric(as.character(dat$year_of_release)) >= 2000,]
+# Scaling user score to 0-100
+dat$user_score = dat$user_score*10
 ```
 
 The data set contains 17416 rows of data with a majority of games being released between 2000s and above.
@@ -126,12 +128,11 @@ plot(user_score ~ genre, data=dat, main="User Score by Genre", xlab="Genre", yla
 ```
 
 ### Differences Between Critics and Users
-
+We 
 ```{r}
-dat$user_score = dat$user_score*10
 agg = aggregate(cbind(critic_score, user_score) ~ genre, data=dat, function(x) mean(x))
-plot(agg$critic_score, agg$user_score, xlim=c(65,75), col="RED", ylab="User Score", xlab="Critic Score", pch=20, main="Critics Score vs User Score")
-text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
+plot(agg$critic_score, agg$user_score, xlim=c(65,75), ylab="User Score", xlab="Critic Score", pch=20, main="Critics Score vs User Score")
+text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col=rainbow())
 ```
 
 ### Sampling & Splitting
@@ -146,9 +147,9 @@ te_dat = split[[2]]
 ```
 
 ### Linear Regression (Model 1)
-Linear regression model built from the features of user count and user score. From our summary we see that user count and user score of ***, this in turn means they have strong relationship to global sales.
+Linear regression model built from the features of critic score and user score. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
 ```{r}
-fit = lm(global_sales ~ user_count + user_score, data=tr_dat)
+fit = lm(global_sales ~ critic_score + user_score, data=tr_dat)
 summary(fit)
 ```
 
@@ -159,14 +160,19 @@ actual = te_dat$global_sales
 plot_predict_actual(predicted, actual, 1, "Actual vs Predicted Global Sales")
 ```
 
-We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.68.
+```{r}
+# Plot
+plot(fit$residuals)
+plot(fit$model)
+
+```
+
+We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.71
 ```{r}
 lmErrs = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
 rmse
-plot(fit)
 ```
-
 
 
 ### Regression Tree (Model 2)
