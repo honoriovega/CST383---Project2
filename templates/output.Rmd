@@ -89,7 +89,7 @@ after/before
 ```
 
 ### Average Sales by Genres
-
+We see that Misc is that top selling genre with mean sales of 1.06 globally. Genres like shooters and platform come in second with a mean sales of 0.92 globally.
 ```{r}
 topGenres = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ genre, data=dat, function(x) mean(x))
 topGenres = topGenres[order(-topGenres$global_sales),]
@@ -112,7 +112,8 @@ plot(global_sales[global_sales>1] ~ critic_score[global_sales>1], data=dat, col=
 points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, col="NAVY", pch=20)
 ```
 
-### Cumlative Distribution of Critic Score(?)
+### Cumlative Distribution of Critic Score 
+We see that from curve from the plot that the
 ```{r}
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
 ```
@@ -128,11 +129,11 @@ plot(user_score ~ genre, data=dat, main="User Score by Genre", xlab="Genre", yla
 ```
 
 ### Differences Between Critics and Users
-We 
+Here we get a closer view of critic and user scores and see for the most part there is small deviation. User scores tend to be higher per genre than their counter part critic scores.
 ```{r}
 agg = aggregate(cbind(critic_score, user_score) ~ genre, data=dat, function(x) mean(x))
 plot(agg$critic_score, agg$user_score, xlim=c(65,75), ylab="User Score", xlab="Critic Score", pch=20, main="Critics Score vs User Score")
-text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col=rainbow())
+text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
 ```
 
 ### Sampling & Splitting
@@ -190,8 +191,8 @@ prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales", typ
 
 ```{r}
 predicted = predict(fit, te_dat)
-errors = te_dat$global_sales - predicted
-rmse = sqrt(mean(errors^2))
+regErrs = te_dat$global_sales - predicted
+rmse = sqrt(mean(regErrs^2))
 rmse
 ```
 
@@ -208,30 +209,13 @@ rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user
 rmse_cv
 ```
 
-```{r}
-
-dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
-
-# we are predicitng global sales
-tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
-tr_dat = dat[tr_rows,]
-te_dat = dat[-tr_rows,]
-
-
-fit = glm(hit ~  critic_score, family=binomial(), data=tr_dat)
-temp = predict(fit, newdata=te_dat, type="response")
-predicts = as.numeric(temp > 0.7)
-actuals = te_dat$hit
-conf_mtx = table(predicts, actuals)
-conf_mtx
-
-succ_rate = mean(predicts == actuals)
-succ_rate
-```
-
-
 ### (Model 3)
 
 ### Comparison of Models
+```{r}
+par(mfrow=c(1,3))
+hist(lmErrs, col="RED", main="Hist of Linear Regression")
+hist(regErrs, col="RED", main="Hist of Regression Tree Model")
+```
 
 ### Our Conclusion
