@@ -46,7 +46,7 @@ cross_validate_lm = function(dat, y, xs, n=10) {
 Our team's goal is to predict global video game sales based off of data collected in the past 15 years. 
 
 ### Introduction
-The dataset comes from Kaggle.com and is a compilation of video games sales along with ratings. 
+The data set is based off of video game sales as of January 2017. Origin of the data can be found using the link provided:  https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings. We decided to use this data set because of each member has an attachment to video games. Being able to predict future video game sales would be valuable to consumers. 
 
 ### Read & Preprocessing
 We read the data in and begin preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score.

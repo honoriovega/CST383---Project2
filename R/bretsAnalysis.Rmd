@@ -6,23 +6,6 @@ output: html_document
 Team goal: Predict Global Videogame Sales based off of given 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -161,3 +144,4 @@ rmse2
 plot(density(errors), col = "green")
 lines(density(errors2), col = "blue")
 ```
+
