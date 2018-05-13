@@ -3,6 +3,26 @@ title: "bretsAnalysis"
 output: html_document
 ---
 
+Team goal: Predict Global Videogame Sales based off of given 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -93,4 +113,51 @@ plot(dat[,names])
 ```{r}
 rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user_count"))
 rmse_cv
+```
+
+
+
+### Linear Regression
+Linear regression model built from the features of user count and user score. From our summary we see that user count and user score of ***, this in turn means they have strong relationship to global sales.
+```{r}
+
+fit2 = lm(global_sales ~ user_count * user_score, data=tr_dat)
+# Summary
+summary(fit2)
+
+# Conf Mtx
+#temp = predict(fit, newdata=te_dat, type="response")
+#predicts = as.numeric(temp > 0.7)
+#actuals = te_dat$hit
+#conf_mtx = table(predicts, actuals)
+#conf_mtx
+```
+
+```{r}
+# Plot
+predicted2 = predict(fit2, newdata=te_dat)
+actual2 = te_dat$global_sales
+
+plot(actual2 ~ predicted2, col="DARK RED", pch=20, main="Actual Global Sales by Predicted Global Sales", xlab="Predicted", ylab="Sales")
+abline(a=0, b=1, col="BLUE", lty=2, lwd=2)
+```
+
+
+### RMSE
+```{r}
+errors2 = actual2-predicted2
+#plot(density(errors))
+hist(errors2)
+
+# RMSE
+#rmse = sqrt(mean(errors^2))
+rmse2 = sqrt(mean((actual2-predicted2)^2))
+rmse2
+```
+
+
+### Linear Regression Diagnostics
+```{r}
+plot(density(errors), col = "green")
+lines(density(errors2), col = "blue")
 ```

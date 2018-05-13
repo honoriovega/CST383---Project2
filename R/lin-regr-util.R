@@ -37,3 +37,34 @@ split_data = function(dat, frac=c(0.75, 0.25)) {
   }
   return(data_sets)
 } 
+
+# perform n-fold cross-validation on the given data set; return mean rmse
+# dat - a data frame
+# y - response variable, as a string
+# xs - predictor variables, as a vector of strings
+# n   - the 'n' in n-fold cross-validation
+cross_validate_lm = function(dat, y, xs, n=10) {
+  # create the formula to be used with lm
+  ff = reformulate(xs, y)
+  
+  # compute indexes of the groups
+  k = nrow(dat)  
+  dat1 = dat[sample(1:k),]     # shuffle the data
+  starts = seq(1, k, by=floor(k/n))[1:n]
+  ends = c(starts[2:n]-1, k)
+  
+  sum_rmse = 0
+  for (i in 1:n) {
+    tests = starts[i]:ends[i]
+    fit = lm(ff, data=dat1[-tests,])
+    if (length(fit$coefficients) > fit$rank) {
+      print(paste0("rank-deficit problem with ", ff))
+    }
+    predicted = predict(fit, newdata=dat1[tests,])
+    actual = dat1[tests,y]
+    rmse = sqrt(mean((actual-predicted)^2))
+    sum_rmse = sum_rmse + rmse
+    # print(paste0(i,": RMSE = ",rmse))
+  }
+  return(sum_rmse/n)
+}
