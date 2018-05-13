@@ -202,6 +202,27 @@ rmse_cv = cross_validate_lm(te_dat, "global_sales", c("platform", "genre", "user
 rmse_cv
 ```
 
+```{r}
+
+dat$hit = factor(ifelse(dat$global_sales>=1, 1, 0))
+
+# we are predicitng global sales
+tr_rows = sample(nrow(dat), 0.7 * nrow(dat))
+tr_dat = dat[tr_rows,]
+te_dat = dat[-tr_rows,]
+
+
+fit = glm(hit ~  critic_score, family=binomial(), data=tr_dat)
+temp = predict(fit, newdata=te_dat, type="response")
+predicts = as.numeric(temp > 0.7)
+actuals = te_dat$hit
+conf_mtx = table(predicts, actuals)
+conf_mtx
+
+succ_rate = mean(predicts == actuals)
+succ_rate
+```
+
 
 ### (Model 3)
 
