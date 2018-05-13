@@ -25,6 +25,9 @@ We read the data in and begin preprocessing. First thing we do is get the total 
 setwd('..')
 dat = read.csv(paste0(getwd(),"/data/Video_Game_Sales_as_of_Jan_2017.csv"))
 names(dat) = tolower(names(dat))
+
+# NAs
+sum(is.na(dat))
 ```
 
 The data set contains 17416 rows of data with a majority of games being released between 2000s and above.
@@ -56,7 +59,7 @@ head(topGenres, 10)
 ```
 
 ### Highest Sales by Platform
-We see in this data set that PS2 has highest sum of sales of all platforms. While X360 and PS3 come in second and third respectively. Its suprising to see PS2 have the highest sum of sales since it was relased in March of 2000. 
+We see in this data set that PS2 has highest sum of sales of all platforms. While X360 and PS3 come in second and third respectively. It is suprising to see PS2 have the highest sum of sales considering it was relased in March of 2000. 
 ```{r}
 topPlatforms = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ platform, data=dat, function(x) sum(x))
 topPlatforms = topPlatforms[order(-topPlatforms$global_sales),]
@@ -65,15 +68,15 @@ head(topPlatforms, 10)
 
 
 ### Critic Scores lead to Higher Global Sales?
-From our plot we see that games that achieved a critic score greater than 50 tended to have higher global sales. While majority of games that didn't achieve sales of 1 Million are distributed 20-100.
+From our plot we see that games that achieved a critic score greater than 50 tended to have higher global sales. While majority of games that didn't achieve sales of 1 Million are distributed between 20-100 on critic score.
 ```{r}
 plot(global_sales[global_sales>1] ~ critic_score[global_sales>1], data=dat, col="RED", pch=20, xlab="Critic Score", ylab="Sales", main="Critic Score by Global Sales")
 points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, col="NAVY", pch=20)
 ```
 
-### Cumlative Distribution of Global Sales(?)
+### Cumlative Distribution of Critic Score(?)
 ```{r}
-plot(ecdf(dat$global_sales), col="RED", main="Global Sales")
+plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
 ```
 
 
@@ -107,6 +110,30 @@ We then test our linear regression model by computing the root mean squared erro
 lmErrs = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
 rmse
+plot(fit)
+```
+
+### Learning Curves(Model 1)
+```{r}
+library(caret)
+learningCurve = function(training, test, interval, max) {
+  tr_errs = c()
+  te_errs = c()
+  tr_act = tr_dat$global_sales
+  te_act = te_dat$global_sales
+  sizes = seq(interval, max, interval)
+  for (size in sizes) {
+    dat = tr_dat[1:size,]
+    fit = lm(global_sales ~ user_score + user_count, data=dat)
+    tr_pred = predict(fit)
+    te_pred = predict(fit, newdata=te_dat)
+    tr_errs = c(tr_errs, 1-mean(tr_pred==tr_act))
+    te_errs = c(te_errs, 1-mean(te_pred==te_act))
+  }
+  plot(sizes, tr_errs, type="b", xlab="Training Size", ylab="Error", col="blue")
+  points(sizes, te_errs, type="b", col="RED")
+}
+learningCurve(tr_dat, te_dat, 100, 1000)
 ```
 
 
