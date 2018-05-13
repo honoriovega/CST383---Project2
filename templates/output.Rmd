@@ -119,6 +119,14 @@ plot(critic_score ~ genre, data=dat, main="Critic Score by Genre", xlab="Genre",
 plot(user_score ~ genre, data=dat, main="User Score by Genre", xlab="Genre", ylab="User Score", col="RED")
 ```
 
+### Differences Between Critics and Users
+
+```{r}
+dat$user_score = dat$user_score*10
+agg = aggregate(cbind(critic_score, user_score) ~ genre, data=dat, function(x) mean(x))
+plot(agg$critic_score, agg$user_score, xlim=c(65,75), col="RED", ylab="User Score", xlab="Critic Score", pch=20, main="Critics Score vs User Score")
+text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
+```
 
 ### Sampling & Splitting
 We sample from the data and create training and test data sets with a 70/30 split respectively.
