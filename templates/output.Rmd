@@ -172,13 +172,12 @@ tr_dat = split[[1]]
 te_dat = split[[2]]
 ```
 
-Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577. The goal for our models is to get an RMSE below the mean RMSE. Using cross_validate_lm() will give us a base line for our target RMSE.
-
+### Cross Validation
+Before we setup our first model we use cross validation to get an idea of what to expect with our first model. We achieved a RMSE score of 1.72 with features of critic score, user score, and genre.
 ```{r}
-rmse_cv = cross_validate_lm(dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv = cross_validate_lm(dat, "global_sales", c("critic_score", "user_score", "genre"))
 rmse_cv
 ```
-
 
 ### Linear Regression (Model 1)
 For our first model we decided to keep it simple and use a Linear regression model. We built our model with features of critic score, user score, and genre. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
@@ -201,6 +200,14 @@ We then test our linear regression model by computing the root mean squared erro
 lmErrs1 = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
 rmse
+```
+
+### Cross Validation
+Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577. The goal for our models is to get an RMSE below the mean RMSE. Using cross_validate_lm() will give us a base line for our target RMSE.
+
+```{r}
+rmse_cv = cross_validate_lm(dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv
 ```
 
 ### Linear Regression (Model 2)
@@ -248,7 +255,7 @@ rmse = sqrt(mean(regErrs^2))
 rmse
 ```
 
-Looking at the predicted line versus the actual points, the predicted line follows the points to a certain extent. However, the plot_predict_actual is designed to work with lnear regression. Here, we are using it for Regression Trees, but the point of the plot is to show if the predicted line at all matches the points. From the plotted points, the predicted line follows the points and implies that the model works with the data.
+Looking at the predicted line versus the actual points, the predicted line follows the points to a certain extent. However, the plot_predict_actual is designed to work with linear regression. Here, we are using it for Regression Trees, but the point of the plot is to show if the predicted line at all matches the points. From the plotted points, the predicted line follows the points and implies that the model works with the data.
 
 ```{r}
 plot_predict_actual(predicted, te_dat$global_sales, 2, "Actual vs Predicted Global Sales")
@@ -257,6 +264,7 @@ plot_predict_actual(predicted, te_dat$global_sales, 2, "Actual vs Predicted Glob
 Using the cross_validate_lm() function, the target RMSE was to get below 1.6752. The first model achieved an RMSE of 1.79, the second's RMSE is 1.682, and the third model achieved the lowest RMSE of 1.495. Our third model, using Regression Trees, is the best model to use when predicting global video game sales.
 
 ### Comparison of Models
+
 ```{r}
 par(mfrow=c(1,3))
 hist(lmErrs1, col="RED", main="Hist of Linear Regression", xlab="Errors")
