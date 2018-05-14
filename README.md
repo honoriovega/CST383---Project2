@@ -1,5 +1,6 @@
 [Notes](https://docs.google.com/document/d/1vFNwFE4N003kIkTM-nWVUDCLOxeDa419aMzrYmvlzBY/edit)
 [Report](https://cst383-project2.herokuapp.com/)
+[Backup Report](http://hosting.otterlabs.org/classes/vega3229/public_html/cst383_project2.html)
 #### CST 383: Intro to Data Science  - Dr. Glenn Bruns
 #### Spring 2018
 ###### Report Submitter: Andrew Sanchez
@@ -13,7 +14,7 @@ Your goal is to complete a small but professional data science project.
 - Your project should use the techniques we’ve covered in class.  For this project, be sure to apply machine learning methods: supervised learning (classification, regression) and unsupervised learning (cluster analysis, anomaly detection)
 - Your final report should be an R Markdown document along with generated HTML.  The report should include sections covering all the steps listed above (data acquisition, cleaning, etc.).
 - Meet with Prof. Bruns regularly during the project to make sure you are heading in the right direction.
-- 
+-
 ## Project grading.  
 I will assess your project using your final report.  The project will be graded on a scale of 0-100.  Grading will be based on these elements:
 
