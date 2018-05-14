@@ -91,6 +91,9 @@ after/before
 ```
 
 ### Number of games in each Genre
+Below is a barplot by games by Genre. We notice that Misc Genre had the most selling
+games even though it accounts for less games. Based on the barplot, there are far more action
+games. 
 ```{r}
 par(mar=c(3,7,1,1))
 barplot(sort(table(dat$genre)),horiz=TRUE,las=1,main="Number of games by genre",col="RED")
