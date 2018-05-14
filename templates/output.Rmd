@@ -46,7 +46,7 @@ cross_validate_lm = function(dat, y, xs, n=10) {
 Our team's goal is to predict global video game sales based off of data collected in the past 15 years. 
 
 ### Introduction
-The data set is based off of video game sales as of January 2017. Origin of the data can be found using the link provided:  https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings. We decided to use this data set because of each member has an attachment to video games. Being able to predict future video game sales would be valuable to consumers and companies. 
+The data set is based off of video game sales as of January 2017. Origin of the data can be found using the link provided:  https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings. We decided to use this data set because of each member has an attachment to video games. Being able to predict future video game sales would be valuable to consumers and companies. The dataset comes with a structure of factors, ints, and numeric values. With Platform, year of release, and genre being of factors types. While variables that deal with sales and scores are broken up into numeric/ints.
 
 ### Read & Preprocessing
 We read the data in and begin preprocessing. First thing we do is get the total number of NAs values and see that there is 37396 rows of missing data. In order to keep our data recent and relevent we decided to use complete cases. Since many of the games with a year of release lower than 2000s tended to have missing data such as global sales, critic score, and user score. We also scale user score from 0-100 that way it will resemble critics score scaling.
@@ -91,7 +91,7 @@ after/before
 ```
 
 ### Number of games in each Genre
-Below is a barplot by games by Genre. We notice that Misc Genre had the most selling games even though it accounts for less games. Based on the barplot, there are far more action games. 
+Below is barplot this breaks down games by their genre. From face value we see that action genres is types of games that are being produced. It's suprising to see that because as a group consensus, we typically played shooter genres.
 ```{r}
 par(mar=c(3,7,1,1))
 barplot(sort(table(dat$genre)),horiz=TRUE,las=1,main="Number of games by genre",col="RED")
@@ -106,7 +106,7 @@ barplot(sort(table(dat$platform)),horiz=TRUE,las=1,main="Number of Games by Plat
 ```
 
 ### Average Sales by Genres
-We see that Misc is that top selling genre with mean sales of 1.06 globally. Genres like shooters and platform come in second with a mean sales of 0.92 globally.
+We see that Misc is that top selling genre with mean sales of 1.06 globally. We notice that Misc Genre had the highest mean in sales compared to others. This was interesting because more Misc game small portion compared to other genres. Genres like shooters and platform come in second with a mean sales of 0.92 globally.
 
 ```{r}
 topGenres = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ genre, data=dat, function(x) mean(x))
@@ -133,7 +133,7 @@ points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, co
 ```
 
 ### Cumlative Distribution of Critic Score
-In this plot we see critic score tended to curve earlier than user score. The majoriy of games scored by critics has more of even distrubtion while games scored by users has tended to have an higher overall score in games.
+In this plot we see critic score tended to curve earlier than user score, meaning there were more games that critics scored higher than users. The games scored by critics had more of even distribution while games scored by users tended to have an higher overall score in games.
 
 ```{r}
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
@@ -201,6 +201,13 @@ rmse = sqrt(mean((actual-predicted)^2))
 rmse
 ```
 
+After we get our see our rmse, we plot the fit to get a better understanding of our model. In our first plot Residuals vs Fitted what we're trying to achieve is level red line. Residuals is the difference between the data and our predicted line created in the linear regression model. As you can see we achieved a near flat line which in turn shows that our model assumptions hold true. The second plot we're trying achieve plotted points along the dotted red-line, this in turn is testing gaussian.  
+```{r}
+plot(fit)
+```
+
+
+
 ### Cross Validation
 Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577. The goal for our models is to get an RMSE below the mean RMSE. Using cross_validate_lm() will give us a base line for our target RMSE.
 
@@ -231,6 +238,13 @@ lmErrs2 = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
 rmse
 ```
+
+
+After the RMSE plot, we run our diagnostic plots to better interpret out model. We see in the first plot the our red line nearly resembles a straight line, which in turn means our models assumptions hold true. As for the second plot, it didn't do as well as the first linear regression model as what we're looking for is points plotted along the dotted line. In the beginning and end the points tend to fall stray off.
+```{r}
+plot(fit)
+```
+
 
 ### Regression Tree (Model 3)
 Having used Linear Regression and achieving an RMSE of 1.71, we decided to use a Regression Tree model to compare the two models and try to lower the RMSE of the Linear Regression. Unlike the previous model, Regression Tree uses the library rpart to create the model. Focusing on genre, platform, and user_count, we hope to achieve an RMSE of around 1.5 using a Regression Tree.
@@ -271,7 +285,7 @@ hist(regErrs, col="RED", main="Hist of Regression Tree Model", xlab="Errors")
 ```
 
 ### Our Conclusion
-Based on our initial goal/hypothesis, we were able to predict global video game sales. Our Regression Tree model had the lowest RMSE out of the three models. Because of this, using Regression Tree to predict global video game sales is the best machine learning algorithm, based on the two algorithms we used. 
+Based on our initial goal/hypothesis, we were able to predict global video game sales. Our Regression Tree model achieved the lowest RMSE out of the three models. Because of this, using Regression Tree to predict global video game sales was the best machine learning algorithm, based on the two algorithms we used. There was also some interesting things in the data, one such misc had the highest mean of sales compared to other genres; Misc is a much smaller percentage of games compared to other genres such as actions and sports games. Games that achieved high critic score tended to have higher global sales compared to games that did not achieve a good critic score.
 
 ### Libraries and Functions used in the project
 ```{r}
