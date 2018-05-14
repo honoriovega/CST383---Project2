@@ -92,6 +92,7 @@ after/before
 
 ### Average Sales by Genres
 We see that Misc is that top selling genre with mean sales of 1.06 globally. Genres like shooters and platform come in second with a mean sales of 0.92 globally.
+
 ```{r}
 topGenres = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ genre, data=dat, function(x) mean(x))
 topGenres = topGenres[order(-topGenres$global_sales),]
@@ -100,6 +101,7 @@ head(topGenres, 10)
 
 ### Highest Sales by Platform
 We see in this data set that PS2 has highest sum of sales of all platforms. While X360 and PS3 come in second and third respectively. It is suprising to see PS2 have the highest sum of sales considering it was relased in March of 2000. 
+
 ```{r}
 topPlatforms = aggregate(cbind(global_sales, na_sales, jp_sales, eu_sales) ~ platform, data=dat, function(x) sum(x))
 topPlatforms = topPlatforms[order(-topPlatforms$global_sales),]
@@ -109,6 +111,7 @@ head(topPlatforms, 10)
 
 ### Critic Scores lead to Higher Global Sales?
 From our plot we see that games that achieved a critic score greater than 50 tended to have higher global sales. While majority of games that didn't achieve sales of 1 Million are distributed between 20-100 on critic score.
+
 ```{r}
 plot(global_sales[global_sales>1] ~ critic_score[global_sales>1], data=dat, col="RED", pch=20, xlab="Critic Score", ylab="Sales", main="Critic Score by Global Sales")
 points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, col="NAVY", pch=20)
@@ -116,13 +119,15 @@ points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, co
 
 ### Cumlative Distribution of Critic Score
 We see that the curve closely resembles one 
+
 ```{r}
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
 lines(ecdf(dat$user_score), col="BLUE", main="User Score")
 ```
 
 ### Critic Scores vs User Scores by Genres
-We see overall user scores are generally higher than critics scores. User scores are usually based off their experiences and impressions of a game, while critic scores are generally follow baselines of how to score a game. 
+We see overall user scores are generally higher than critics scores. User scores are usually based off their experiences and impressions of a game, while critic scores are generally follow baselines of how to score a game.
+
 ```{r}
 par(mfrow=c(1,2))
 # Critic Score
@@ -133,6 +138,7 @@ plot(user_score ~ genre, data=dat, main="User Score by Genre", xlab="Genre", yla
 
 ### Differences Between Critics and Users
 Here we get a closer view of critic and user scores and see for the most part there is small deviation. User scores tend to be higher per genre than their counter part critic scores.
+
 ```{r}
 agg = aggregate(cbind(critic_score, user_score) ~ genre, data=dat, function(x) mean(x))
 plot(agg$critic_score, agg$user_score, xlim=c(65,75), ylab="User Score", xlab="Critic Score", pch=20, main="Critics Score vs User Score")
@@ -150,9 +156,17 @@ tr_dat = split[[1]]
 te_dat = split[[2]]
 ```
 
+Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577. The goal for our models is to get an RMSE below the mean RMSE. Using cross_validate_lm() will give us a base line for our target RMSE.
 
-### Linear Regression(Model1)
+```{r}
+rmse_cv = cross_validate_lm(dat, "global_sales", c("platform", "genre", "user_count"))
+rmse_cv
+```
+
+
+### Linear Regression (Model 1)
 For our first model we decided to keep it simple and use a Linear regression model. We built our model with features of critic score, user score, and genre. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
+
 ```{r}
 fit = lm(global_sales ~ critic_score + user_score + genre, data=tr_dat)
 summary(fit)
@@ -165,7 +179,8 @@ actual = te_dat$global_sales
 plot_predict_actual(predicted, actual, 1.5, "Actual vs Predicted Global Sales")
 ```
 
-We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.79
+We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.79.
+
 ```{r}
 lmErrs1 = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
@@ -174,6 +189,7 @@ rmse
 
 ### Linear Regression (Model 2)
 With our second model we decided to try and improve the our model by choosing different features. This time the features we choose are genre, platform, and user count. 
+
 ```{r}
 fit = lm(global_sales ~ genre + platform + user_count, data=tr_dat)
 summary(fit)
@@ -187,12 +203,12 @@ plot_predict_actual(predicted, actual, 1.5, "Actual vs Predicted Global Sales")
 ```
 
 This time with our second model we achieved lower RMSE score of 1.68, which is an improvement to the previous linear model.
+
 ```{r}
 lmErrs2 = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
 rmse
 ```
-
 
 ### Regression Tree (Model 3)
 Having used Linear Regression and achieving an RMSE of 1.71, we decided to use a Regression Tree model to compare the two models and try to lower the RMSE of the Linear Regression. Unlike the previous model, Regression Tree uses the library rpart to create the model. Focusing on genre, platform, and user_count, we hope to achieve an RMSE of around 1.5 using a Regression Tree.
@@ -200,11 +216,13 @@ Having used Linear Regression and achieving an RMSE of 1.71, we decided to use a
 ```{r}
 fit = rpart(global_sales ~ genre + platform + user_count, data=tr_dat)
 ```
+
 This is the plotted Regression Tree model using features genre, platform, and user_count. This Regression Tree split initially by user_score of 314. Based on how relevant each feature is, the tree split from there. Looking at the platform = PC, PSV, the split there is based off how popular a specific platform is and its relevance to global_sales. For the outcome of the Regression Tree, platform is the most relevant feature based on each ending platform leaf node.
 
 ```{r}
-prp(fit, extra=1, varlen=-10,main="Regression Tree to predict Global Sales", type = 2, tweak = 1.5, box.col="tan")
+prp(fit, extra=1, varlen=-10,main="Regression Tree to Predict Global Sales", type = 2, tweak = 1.5, box.col="tan")
 ```
+
 Here is the calculated RMSE using the testing data and the predicted fit. We achieved an RMSE of 1.495, which is lower than our predicted RMSE before we began the Regression Tree model. Comparing Regression Tree to Linear Regression,
 
 ```{r}
@@ -213,18 +231,15 @@ regErrs = te_dat$global_sales - predicted
 rmse = sqrt(mean(regErrs^2))
 rmse
 ```
+
 Looking at the predicted line versus the actual points, the predicted line follows the points to a certain extent. However, the plot_predict_actual is designed to work with lnear regression. Here, we are using it for Regression Trees, but the point of the plot is to show if the predicted line at all matches the points. From the plotted points, the predicted line follows the points and implies that the model works with the data.
 
 ```{r}
-plot_predict_actual(predicted, te_dat$global_sales, 2, "regression tree price prediction")
+plot_predict_actual(predicted, te_dat$global_sales, 2, "Actual vs Predicted Global Sales")
 ```
 
-Here is the cross validated RMSE using the cross_validate_lm() function provided to us earlier in the semester. The mean RMSE is 1.6577
+Using the cross_validate_lm() function, the target RMSE was to get below 1.6752. The first model achieved an RMSE of 1.79, the second's RMSE is 1.682, and the third model achieved the lowest RMSE of 1.495. Our third model, using Regression Trees, is the best model to use when predicting global video game sales.
 
-```{r}
-rmse_cv = cross_validate_lm(dat, "global_sales", c("platform", "genre", "user_count"))
-rmse_cv
-```
 
 ### Comparison of Models
 ```{r}
