@@ -1,5 +1,5 @@
 ---
-title: "Analysis of Video Game Sales Prediction"
+title: "Using Regression to Predict Global Video Game Sales"
 author: "Honorio Vega, Andrew Sanchez, Bret Stine"
 date: "May 3, 2018"
 output: html_document
@@ -263,7 +263,6 @@ plot_predict_actual(predicted, te_dat$global_sales, 1.5, "Actual vs Predicted Gl
 Using the cross_validate_lm() function, the target RMSE was to get below 1.6752. The first model achieved an RMSE of 1.79, the second's RMSE is 1.682, and the third model achieved the lowest RMSE of 1.495. Our third model, using Regression Trees, is the best model to use when predicting global video game sales.
 
 ### Comparison of Models
-At the end we compare our models errors and see that reg
 ```{r}
 par(mfrow=c(1,3))
 hist(lmErrs1, col="RED", main="Hist of Linear Regression", xlab="Errors")
@@ -274,7 +273,7 @@ hist(regErrs, col="RED", main="Hist of Regression Tree Model", xlab="Errors")
 ### Our Conclusion
 Based on our initial goal/hypothesis, we were able to predict global video game sales. Our Regression Tree model had the lowest RMSE out of the three models. Because of this, using Regression Tree to predict global video game sales is the best machine learning algorithm, based on the two algorithms we used. 
 
-### Libraries and function used in the project
+### Libraries and Functions used in the project
 ```{r}
 library(rpart)
 library(rpart.plot)
