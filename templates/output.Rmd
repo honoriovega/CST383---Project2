@@ -4,7 +4,7 @@ author: "Honorio Vega, Andrew Sanchez, Bret Stine"
 date: "May 3, 2018"
 output: html_document
 ---
-```{r global_options, include=TRUE}
+```{r global_options, include=FALSE}
 knitr::opts_chunk$set(prompt=TRUE, comment="", echo=TRUE)
 library(rpart)
 library(rpart.plot)
@@ -161,7 +161,7 @@ text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
 ```
 
 ### Sampling & Splitting
-We sample from the data and create training and test data sets with a 70/30 split respectively.
+We sample from the data and create training and test data sets with a 80/20 split respectively.
 ```{r}
 # 
 set.seed(123)
@@ -273,3 +273,41 @@ hist(regErrs, col="RED", main="Hist of Regression Tree Model", xlab="Errors")
 
 ### Our Conclusion
 Based on our initial goal/hypothesis, we were able to predict global video game sales. Our Regression Tree model had the lowest RMSE out of the three models. Because of this, using Regression Tree to predict global video game sales is the best machine learning algorithm, based on the two algorithms we used. 
+
+### Libraries and function used in the project
+```{r}
+library(rpart)
+library(rpart.plot)
+library(maptree)
+source("https://raw.githubusercontent.com/grbruns/cst383/master/lin-regr-util.R")
+# perform n-fold cross-validation on the given data set; return mean rmse
+# dat - a data frame
+# y - response variable, as a string
+# xs - predictor variables, as a vector of strings
+# n   - the 'n' in n-fold cross-validation
+cross_validate_lm = function(dat, y, xs, n=10) {
+  # create the formula to be used with lm
+  ff = reformulate(xs, y)
+  
+  # compute indexes of the groups
+  k = nrow(dat)  
+  dat1 = dat[sample(1:k),]     # shuffle the data
+  starts = seq(1, k, by=floor(k/n))[1:n]
+  ends = c(starts[2:n]-1, k)
+  
+  sum_rmse = 0
+  for (i in 1:n) {
+    tests = starts[i]:ends[i]
+    fit = lm(ff, data=dat1[-tests,])
+    if (length(fit$coefficients) > fit$rank) {
+      print(paste0("rank-deficit problem with ", ff))
+    }
+    predicted = predict(fit, newdata=dat1[tests,])
+    actual = dat1[tests,y]
+    rmse = sqrt(mean((actual-predicted)^2))
+    sum_rmse = sum_rmse + rmse
+    # print(paste0(i,": RMSE = ",rmse))
+  }
+  return(sum_rmse/n)
+}
+```
