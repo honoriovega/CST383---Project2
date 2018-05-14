@@ -90,6 +90,12 @@ after/before
 
 ```
 
+### Games by platform
+```{r}
+par(mar=c(3,7,1,1))
+barplot(sort(table(dat$platform)),horiz=TRUE,las=1,main="Number of games by publisher",col="RED")
+```
+
 ### Average Sales by Genres
 We see that Misc is that top selling genre with mean sales of 1.06 globally. Genres like shooters and platform come in second with a mean sales of 0.92 globally.
 
