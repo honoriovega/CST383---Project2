@@ -277,6 +277,7 @@ plot_predict_actual(predicted, te_dat$global_sales, 1.5, "Actual vs Predicted Gl
 Using the cross_validate_lm() function, the target RMSE was to get below 1.6752. The first model achieved an RMSE of 1.79, the second's RMSE is 1.682, and the third model achieved the lowest RMSE of 1.495. Our third model, using Regression Trees, is the best model to use when predicting global video game sales.
 
 ### Comparison of Models
+For each model we plot a histogram of its errors. This will allow us to get a visualization of the errors and compare our models to one another. We see with all 3 models the errors do not stray far from our predictions and that closely resemble one another. Regression trees are more prone to overfitting due it being a non-parametric model, but in this case our regression tree holds true since it similiar to our linear models.
 ```{r}
 par(mfrow=c(1,3))
 hist(lmErrs1, col="RED", main="Hist of Linear Regression", xlab="Errors")
