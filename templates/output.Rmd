@@ -152,7 +152,7 @@ te_dat = split[[2]]
 
 
 ### Linear Regression(Model1)
-For our first model we decided to keep it simple and use a Linear regression model.  built from the features of critic score and user score. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
+For our first model we decided to keep it simple and use a Linear regression model. We built our model with features of critic score, user score, and genre. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
 ```{r}
 fit = lm(global_sales ~ critic_score + user_score + genre, data=tr_dat)
 summary(fit)
@@ -162,7 +162,7 @@ summary(fit)
 # Plot
 predicted = predict(fit, newdata=te_dat)
 actual = te_dat$global_sales
-plot_predict_actual(predicted, actual, 1, "Actual vs Predicted Global Sales")
+plot_predict_actual(predicted, actual, 1.5, "Actual vs Predicted Global Sales")
 ```
 
 We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.79
@@ -173,7 +173,7 @@ rmse
 ```
 
 ### Linear Regression (Model 2)
-Linear regression model built from the features of critic score and user score. From our summary we see that critic score and user score of ***, this in turn means they have strong relationship to global sales.
+With our second model we decided to try and improve the our model by choosing different features. This time the features we choose are genre, platform, and user count. 
 ```{r}
 fit = lm(global_sales ~ genre + platform + user_count, data=tr_dat)
 summary(fit)
@@ -183,10 +183,10 @@ summary(fit)
 # Plot
 predicted = predict(fit, newdata=te_dat)
 actual = te_dat$global_sales
-plot_predict_actual(predicted, actual, 1, "Actual vs Predicted Global Sales")
+plot_predict_actual(predicted, actual, 1.5, "Actual vs Predicted Global Sales")
 ```
 
-We then test our linear regression model by computing the root mean squared error(RMSE). With RMSE the lower the value the better, with our model we achieved a RMSE value of 1.68
+This time with our second model we achieved lower RMSE score of 1.68, which is an improvement to the previous linear model.
 ```{r}
 lmErrs2 = actual-predicted
 rmse = sqrt(mean((actual-predicted)^2))
