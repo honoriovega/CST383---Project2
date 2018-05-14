@@ -162,12 +162,12 @@ text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
 ```
 
 ### Sampling & Splitting
-We sample from the data and create training and test data sets with a 70/30 split respectively.
+We sample from the data and create training and test data sets with a 80/20 split respectively.
 ```{r}
 # 
 set.seed(123)
 
-split = split_data(dat, c(4,1))
+split = split_data(dat, c(0.8,0.2))
 tr_dat = split[[1]]
 te_dat = split[[2]]
 ```
