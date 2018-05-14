@@ -90,6 +90,13 @@ after/before
 
 ```
 
+### Number of games in each Genre
+```{r}
+par(mar=c(3,7,1,1))
+barplot(sort(table(dat$genre)),horiz=TRUE,las=1,main="Number of games by genre",col="RED")
+```
+
+
 ### Games by platform
 ```{r}
 par(mar=c(3,7,1,1))
@@ -256,5 +263,5 @@ hist(regErrs, col="RED", main="Hist of Regression Tree Model", xlab="Errors")
 ```
 
 ### Our Conclusion
-In conclusion we have analyzed and create models to predict video game sales. We have created 3
+In conclusion we have analyzed and created models to predict video game sales. We have created 3
 models to see the benefits of each one.
