@@ -133,7 +133,7 @@ points(global_sales[global_sales<1] ~ critic_score[global_sales<1], data=dat, co
 ```
 
 ### Cumlative Distribution of Critic Score
-We see that the curve closely resembles one 
+In this plot we see critic score tended to curve earlier than user score. The majoriy of games scored by critics has more of even distrubtion while games scored by users has tended to have an higher overall score in games.
 
 ```{r}
 plot(ecdf(dat$critic_score), col="RED", main="Critic Score")
@@ -224,7 +224,7 @@ actual = te_dat$global_sales
 plot_predict_actual(predicted, actual, 1.5, "Actual vs Predicted Global Sales")
 ```
 
-This time with our second model we achieved lower RMSE score of 1.68, which is an improvement to the previous linear model.
+This time with our second model we achieved lower RMSE score of 1.68, which is an improvement from the previous linear model.
 
 ```{r}
 lmErrs2 = actual-predicted
