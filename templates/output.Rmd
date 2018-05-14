@@ -91,19 +91,18 @@ after/before
 ```
 
 ### Number of games in each Genre
-Below is a barplot by games by Genre. We notice that Misc Genre had the most selling
-games even though it accounts for less games. Based on the barplot, there are far more action
-games. 
+Below is a barplot by games by Genre. We notice that Misc Genre had the most selling games even though it accounts for less games. Based on the barplot, there are far more action games. 
 ```{r}
 par(mar=c(3,7,1,1))
 barplot(sort(table(dat$genre)),horiz=TRUE,las=1,main="Number of games by genre",col="RED")
 ```
 
 
-### Games by platform
+### Games by Platform
+In this plot we see that PS2 has the highest amount of games per platform with over 1000 games. Its suprising to see that XOne and PS4 have relatively low amount of games than Wii and DS platforms, since they are the current generation of consoles.
 ```{r}
 par(mar=c(3,7,1,1))
-barplot(sort(table(dat$platform)),horiz=TRUE,las=1,main="Number of games by publisher",col="RED")
+barplot(sort(table(dat$platform)),horiz=TRUE,las=1,main="Number of Games by Platform",col="RED")
 ```
 
 ### Average Sales by Genres
@@ -162,12 +161,12 @@ text(agg$critic_score, agg$user_score, labels=agg$genre, pos=4, col="RED")
 ```
 
 ### Sampling & Splitting
-We sample from the data and create training and test data sets with a 80/20 split respectively.
+We sample from the data and create training and test data sets with a 70/30 split respectively.
 ```{r}
 # 
 set.seed(123)
 
-split = split_data(dat, c(0.8,0.2))
+split = split_data(dat, c(4,1))
 tr_dat = split[[1]]
 te_dat = split[[2]]
 ```
@@ -258,13 +257,13 @@ rmse
 Looking at the predicted line versus the actual points, the predicted line follows the points to a certain extent. However, the plot_predict_actual is designed to work with linear regression. Here, we are using it for Regression Trees, but the point of the plot is to show if the predicted line at all matches the points. From the plotted points, the predicted line follows the points and implies that the model works with the data.
 
 ```{r}
-plot_predict_actual(predicted, te_dat$global_sales, 2, "Actual vs Predicted Global Sales")
+plot_predict_actual(predicted, te_dat$global_sales, 1.5, "Actual vs Predicted Global Sales")
 ```
 
 Using the cross_validate_lm() function, the target RMSE was to get below 1.6752. The first model achieved an RMSE of 1.79, the second's RMSE is 1.682, and the third model achieved the lowest RMSE of 1.495. Our third model, using Regression Trees, is the best model to use when predicting global video game sales.
 
 ### Comparison of Models
-
+At the end we compare our models errors and see that reg
 ```{r}
 par(mfrow=c(1,3))
 hist(lmErrs1, col="RED", main="Hist of Linear Regression", xlab="Errors")
